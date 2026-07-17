@@ -1,0 +1,2 @@
+# Context: ElectricElite AI Inventory
+ElectricElite is a retail electronics inventory management system developed as a Business Analytics MBA demonstration project. The system focuses on automating e-commerce listing creation using AI (Google Gemini) and providing analytical insights into inventory health. It prioritizes a clean, premium SaaS UI and modular extensibility.

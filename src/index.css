@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Brand Accent Colors (Indigo System) */
+    --brand-50: #f5f3ff;
+    --brand-100: #ede9fe;
+    --brand-200: #ddd6fe;
+    --brand-300: #c4b5fd;
+    --brand-400: #a78bfa;
+    --brand-500: #8b5cf6; /* Main brand color */
+    --brand-600: #7c3aed;
+    --brand-700: #6d28d9;
+    --brand-800: #5b21b6;
+    --brand-900: #4c1d95;
+
+    /* Semantic Light Theme Backgrounds */
+    --bg-primary: #f8fafc; /* Slate 50 */
+    --bg-secondary: #ffffff; /* pure white */
+    --bg-card: #ffffff;
+    --bg-glass: rgba(255, 255, 255, 0.7);
+
+    /* Semantic Light Theme Typography */
+    --text-primary: #0f172a; /* Slate 900 */
+    --text-secondary: #475569; /* Slate 600 */
+    --text-muted: #94a3b8; /* Slate 400 */
+    --text-inverse: #ffffff;
+
+    /* Semantic Light Theme Borders */
+    --border-primary: #e2e8f0; /* Slate 200 */
+    --border-secondary: #f1f5f9; /* Slate 100 */
+  }
+
+  html.dark {
+    /* Brand Accent Colors (Shifted indigo for high contrast in dark mode) */
+    --brand-50: #1e1b4b;
+    --brand-100: #312e81;
+    --brand-200: #3730a3;
+    --brand-300: #4338ca;
+    --brand-400: #4f46e5;
+    --brand-500: #6366f1; /* Main brand color in dark mode */
+    --brand-600: #818cf8;
+    --brand-700: #a5b4fc;
+    --brand-800: #c7d2fe;
+    --brand-900: #e0e7ff;
+
+    /* Semantic Dark Theme Backgrounds */
+    --bg-primary: #090d16; /* Deep space dark */
+    --bg-secondary: #0f1524; /* Sidebar dark */
+    --bg-card: #131b2e; /* Card dark */
+    --bg-glass: rgba(19, 27, 46, 0.65);
+
+    /* Semantic Dark Theme Typography */
+    --text-primary: #f8fafc; /* Slate 50 */
+    --text-secondary: #cbd5e1; /* Slate 300 */
+    --text-muted: #64748b; /* Slate 500 */
+    --text-inverse: #0f172a;
+
+    /* Semantic Dark Theme Borders */
+    --border-primary: #1e293b; /* Slate 800 */
+    --border-secondary: #161f38; /* Extra deep dark border */
+  }
+
+  body {
+    @apply bg-bg-primary text-text-primary antialiased font-sans transition-colors duration-200;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-border-primary rounded-full hover:bg-text-muted transition-all;
+}
+
+/* Premium Glassmorphism Helper Classes */
+.glass-panel {
+  @apply bg-bg-glass backdrop-blur-md border border-slate-200/40 dark:border-slate-800/40 shadow-sm rounded-2xl;
+}
+
+.glass-modal {
+  @apply bg-bg-glass backdrop-blur-lg border border-slate-200/60 dark:border-slate-800/60 shadow-xl rounded-2xl;
+}
+
+.gradient-text {
+  @apply bg-gradient-to-r from-brand-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent;
+}
+
+.gradient-bg {
+  @apply bg-gradient-to-tr from-brand-500 to-indigo-600;
+}
+
+.glow-effect {
+  position: relative;
+}
+
+.glow-effect::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(135deg, var(--brand-500), #818cf8);
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.glow-effect:hover::after {
+  opacity: 0.15;
+}
