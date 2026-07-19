@@ -1,8 +1,7 @@
-import React from 'react';
-import { Bell, Search, User, Sparkles } from 'lucide-react';
+import { Bell, Search, User, Sparkles, Menu } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
-export default function Header() {
+export default function Header({ onMenuToggle }) {
   const location = useLocation();
   
   // Dynamic page title based on path
@@ -13,24 +12,31 @@ export default function Header() {
       case '/inventory':
         return 'Inventory Catalog';
       case '/ai-tools':
-        return 'AI Copywriting Assistant';
+        return 'AI Copywriting';
       case '/analytics':
-        return 'Inventory Analytics';
+        return 'Analytics';
       case '/settings':
-        return 'System Settings';
+        return 'Settings';
       default:
         return 'ElectricElite';
     }
   };
 
   return (
-    <header className="h-16 border-b border-border-primary/60 bg-bg-secondary/80 backdrop-blur-md sticky top-0 flex items-center justify-between px-8 z-20">
-      {/* Page Title / Section context */}
-      <div>
-        <h2 className="text-lg font-bold text-text-primary m-0 flex items-center gap-2">
+    <header className="h-16 border-b border-border-primary/60 bg-bg-secondary/80 backdrop-blur-md sticky top-0 flex items-center justify-between px-4 md:px-8 z-20">
+      {/* Left Side: Mobile Menu Button & Page Title */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onMenuToggle}
+          className="md:hidden p-1.5 text-text-secondary hover:text-text-primary hover:bg-border-secondary rounded-xl transition-all border border-border-primary/30"
+          title="Toggle sidebar navigation"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        <h2 className="text-md md:text-lg font-bold text-text-primary m-0 flex items-center gap-2">
           {getPageTitle()}
           {location.pathname === '/' && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-500/10 text-brand-500 border border-brand-500/20">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] md:text-xs font-medium bg-brand-500/10 text-brand-500 border border-brand-500/20 max-xs:hidden">
               <Sparkles className="w-3 h-3" /> Live Monitor
             </span>
           )}

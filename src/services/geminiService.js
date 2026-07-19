@@ -1,6 +1,6 @@
 /**
  * Gemini Service simulating and executing the Google Gemini Flash API pipeline.
- * Extracts product specifications from an uploaded label image.
+ * Extracts product specifications from uploaded label images (up to 4 images).
  */
 
 const MOCK_EXTRACTIONS = [
@@ -159,6 +159,89 @@ Do NOT wrap the output in markdown block (like \`\`\`json ... \`\`\`), do NOT ou
   }
 }
 
+/**
+ * Analyzes up to 4 product images in a single Gemini call.
+ * Sends all images together so Gemini can cross-reference and extract a richer,
+ * more complete spec set from multiple angles/labels.
+ * @param {string[]} imageBase64Array - array of base64 data URIs (max 4)
+ */
+export async function analyzeMultipleProductImages(imageBase64Array) {
+  if (!imageBase64Array || imageBase64Array.length === 0) {
+    return { success: false, error: 'No images provided' };
+  }
+
+  // If only 1 image, fall back to single-image path
+  if (imageBase64Array.length === 1) {
+    return analyzeProductImage(imageBase64Array[0]);
+  }
+
+  const apiKey =
+    import.meta.env.VITE_GEMINI_API_KEY ||
+    localStorage.getItem('electric_elite_gemini_key');
+
+  if (!apiKey) {
+    // Mock fallback: return random extraction
+    return mockGeminiVision(imageBase64Array[0]);
+  }
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+  const prompt = `You are a precise inventory assistant analyzing ${imageBase64Array.length} product images together.
+These images may show different angles, labels, packaging fronts/backs, or close-ups of the SAME product.
+Cross-reference all images to extract the most complete and accurate product specifications. Do NOT hallucinate.
+
+Output ONLY a single JSON object with this exact structure:
+{
+  "sku": "SKU-XXX-XXX-000" (generate a realistic SKU from name/brand),
+  "name": "Full Product Name",
+  "brand": "Brand Name",
+  "category": "Category (e.g., LED Bulbs, Smart Switches, Ceiling Fans, Voltage Stabilizers, Wires & Cables)",
+  "price": 0.00 (estimated INR price or 0.00 if unknown),
+  "stock": 0 (estimated quantity or 0),
+  "specs": {
+    "Key1": "Value1",
+    "Key2": "Value2"
+    (include ALL visible specifications across all images: wattage, voltage, connectivity, dimensions, certifications, etc.)
+  }
+}
+Do NOT wrap output in markdown. Return raw JSON only.`;
+
+  // Build parts array: text prompt first, then all images as inlineData
+  const parts = [{ text: prompt }];
+  for (const imgBase64 of imageBase64Array.slice(0, 4)) {
+    const { mimeType, data } = parseDataUri(imgBase64);
+    parts.push({ inlineData: { mimeType, data } });
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts }],
+        generationConfig: { responseMimeType: 'application/json' }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API returned status ${response.status}`);
+    }
+
+    const resJson = await response.json();
+    const textContent = resJson.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!textContent) {
+      throw new Error("No text content returned from Gemini API");
+    }
+
+    const parsedData = JSON.parse(textContent.trim());
+    return { success: true, data: parsedData, live: true, imageCount: imageBase64Array.length };
+  } catch (error) {
+    console.error("Multi-image Gemini API call failed, falling back to mock:", error);
+    const mockRes = await mockGeminiVision(imageBase64Array[0]);
+    return { ...mockRes, error: error.message, fallback: true };
+  }
+}
+
 export function generateMockCopywriting(product) {
   const price = product.price || 999;
   const formattedPrice = new Intl.NumberFormat('en-IN', {
@@ -279,5 +362,3 @@ You MUST output ONLY a JSON object. Do NOT wrap it in markdown code blocks. Just
     };
   }
 }
-
-

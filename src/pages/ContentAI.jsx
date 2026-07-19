@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Brain, Copy, Check, Download, AlertCircle, ShoppingBag, Send } from 'lucide-react';
+import { Sparkles, Brain, Copy, Check, Download, AlertCircle, ShoppingBag, Send, Printer } from 'lucide-react';
 import { generateCopywriting } from '../services/geminiService';
 import useInventory from '../hooks/useInventory';
+import PamphletModal from '../components/PamphletModal';
 
 export default function ContentAI() {
   const { products } = useInventory();
@@ -10,6 +11,7 @@ export default function ContentAI() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [copiedSection, setCopiedSection] = useState(null);
+  const [isPamphletOpen, setIsPamphletOpen] = useState(false);
 
   // Auto-select the first product if available
   useEffect(() => {
@@ -256,13 +258,22 @@ ${data.instagramCaption}
                 <div className="space-y-6 flex-1">
                   <div className="flex items-center justify-between pb-3 border-b border-border-primary/60">
                     <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider">Generated Output</h3>
-                    <button
-                      onClick={handleDownloadAll}
-                      className="flex items-center gap-1.5 px-3 py-1.5 border border-border-primary hover:border-brand-500/50 hover:bg-brand-500/5 rounded-lg text-[10px] font-bold text-text-secondary hover:text-brand-500 transition-all cursor-pointer"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>Download All (.txt)</span>
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setIsPamphletOpen(true)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 border border-border-primary hover:border-emerald-500/50 hover:bg-emerald-500/5 rounded-lg text-[10px] font-bold text-text-secondary hover:text-emerald-500 transition-all cursor-pointer"
+                      >
+                        <Printer className="w-3.5 h-3.5" />
+                        <span>Create Pamphlet</span>
+                      </button>
+                      <button
+                        onClick={handleDownloadAll}
+                        className="flex items-center gap-1.5 px-3 py-1.5 border border-border-primary hover:border-brand-500/50 hover:bg-brand-500/5 rounded-lg text-[10px] font-bold text-text-secondary hover:text-brand-500 transition-all cursor-pointer"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Download All (.txt)</span>
+                      </button>
+                    </div>
                   </div>
 
                   <div className="space-y-4">
@@ -338,6 +349,14 @@ ${data.instagramCaption}
 
         </div>
       )}
+
+      {/* Automated Catalog Pamphlet Modal */}
+      <PamphletModal
+        isOpen={isPamphletOpen}
+        onClose={() => setIsPamphletOpen(false)}
+        product={selectedProduct}
+        initialDescription={data?.description}
+      />
     </div>
   );
 }

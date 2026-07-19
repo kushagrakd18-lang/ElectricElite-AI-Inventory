@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Search, Plus, Edit, Trash2, SlidersHorizontal, PackageOpen, AlertTriangle, CheckCircle, Info, Sparkles } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, SlidersHorizontal, PackageOpen, AlertTriangle, CheckCircle, Info, Sparkles, Printer } from 'lucide-react';
 import useInventory from '../hooks/useInventory';
 import AddProductModal from '../components/AddProductModal';
 import EditProductModal from '../components/EditProductModal';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import ContentGeneratorModal from '../components/ContentGeneratorModal';
+import PamphletModal from '../components/PamphletModal';
 
 export default function Inventory() {
   const { products, addProduct, updateProduct, deleteProduct } = useInventory();
@@ -16,6 +17,7 @@ export default function Inventory() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
+  const [isPamphletOpen, setIsPamphletOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   // Toast notification state
@@ -226,6 +228,14 @@ export default function Inventory() {
                           </button>
                           <button
                             type="button"
+                            onClick={() => { setSelectedProduct(product); setIsPamphletOpen(true); }}
+                            className="p-1.5 text-text-secondary hover:text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition-all border border-transparent hover:border-emerald-500/20 cursor-pointer"
+                            title="Generate catalog pamphlet/flyer"
+                          >
+                            <Printer className="w-4 h-4 text-emerald-500" />
+                          </button>
+                          <button
+                            type="button"
                             onClick={() => { setSelectedProduct(product); setIsEditOpen(true); }}
                             className="p-1.5 text-text-secondary hover:text-brand-500 hover:bg-brand-500/10 rounded-lg transition-all border border-transparent hover:border-brand-500/20 cursor-pointer"
                             title="Edit component specifications"
@@ -290,6 +300,13 @@ export default function Inventory() {
       <ContentGeneratorModal
         isOpen={isGeneratorOpen}
         onClose={() => { setIsGeneratorOpen(false); setSelectedProduct(null); }}
+        product={selectedProduct}
+      />
+
+      {/* Automated Catalog Pamphlet Modal */}
+      <PamphletModal
+        isOpen={isPamphletOpen}
+        onClose={() => { setIsPamphletOpen(false); setSelectedProduct(null); }}
         product={selectedProduct}
       />
 

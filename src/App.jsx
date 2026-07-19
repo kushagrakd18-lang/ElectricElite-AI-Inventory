@@ -9,11 +9,13 @@ import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 import DataManager from './pages/DataManager';
 import LoginModal from './components/LoginModal';
+import Chatbot from './components/Chatbot';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
     () => sessionStorage.getItem('electric_elite_auth') === 'true'
   );
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (!isAuthenticated) {
     return <LoginModal onAuthenticated={() => setIsAuthenticated(true)} />;
@@ -21,17 +23,25 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-bg-primary text-text-primary flex">
+      <div className="min-h-screen bg-bg-primary text-text-primary flex relative">
         {/* Navigation Sidebar */}
-        <Sidebar />
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+        {/* Mobile Sidebar Overlay */}
+        {sidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black/40 z-30 md:hidden backdrop-blur-sm"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
 
         {/* Main View Area */}
-        <div className="flex-1 pl-64 min-h-screen flex flex-col transition-all duration-300">
+        <div className="flex-1 md:pl-64 pl-0 min-h-screen flex flex-col transition-all duration-300">
           {/* Sticky Header */}
-          <Header />
+          <Header onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
 
           {/* Scrolling View Surface */}
-          <main className="flex-1 p-8 overflow-y-auto max-w-7xl w-full mx-auto">
+          <main className="flex-1 p-4 md:p-8 overflow-y-auto max-w-7xl w-full mx-auto">
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/inventory" element={<Inventory />} />
@@ -42,6 +52,9 @@ function App() {
             </Routes>
           </main>
         </div>
+
+        {/* Global Chatbot Assistant */}
+        <Chatbot />
       </div>
     </Router>
   );
